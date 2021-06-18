@@ -1,4 +1,3 @@
-
 import re
 
 class Row:
@@ -31,17 +30,18 @@ class Chunker:
         self.chunks = []
 
     def processFile(self):
-        babyChunk = []
+        babyChunk = ""
         chunkin = False
 
         with open(self.fileName) as file:
             for line in file:
                 if(chunkin):
                     if(self.finish(line)):
-                        self.chunks.append(babyChunk)
-                        babyChunk.clear()
+                        completeBabychunk = babyChunk
+                        self.chunks.append(completeBabychunk)
+                        babyChunk = ""
                     else:
-                        babyChunk.append(line)
+                        babyChunk += line
                 else:
                     chunkin = self.start(line)
 
@@ -54,6 +54,7 @@ class Chunker:
     def getChunks(self):
         return self.chunks
 
+#"SEASTATE NO    [0-9]"
 #Test code:
 row = Row(1,2,3,4)
 table = Table("TestTable")
