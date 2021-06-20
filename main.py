@@ -1,12 +1,15 @@
 import re
 
+########################
+#       CLASSES        #
+########################
+
 class Row:
     def __init__(self, phase, forceX, forceY, forceZ):
         self.phase = phase
         self.forceX = forceX
         self.forceY = forceY
         self.forceZ = forceZ
-
 
 class Table:
     def __init__(self, name):
@@ -16,11 +19,13 @@ class Table:
     def addRow(self, row):
         self._rows.append(row)
     
-
 class Results:
-    def __init__(self, fileName):
-        self.fileName = fileName
+    def __init__(self, name):
+        self.name = name
         self.tables = []
+
+    def getTables(self):
+        return self.tables
 
 class Chunker:
     def __init__(self, startRegexExp, terminateRegexExp, fileName):
@@ -37,13 +42,15 @@ class Chunker:
             for line in file:
                 if(chunkin):
                     if(self.finish(line)):
-                        completeBabychunk = babyChunk
-                        self.chunks.append(completeBabychunk)
+                        self.chunks.append(babyChunk)
                         babyChunk = ""
+                        chunkin = False
                     else:
                         babyChunk += line
                 else:
-                    chunkin = self.start(line)
+                    if(self.start(line)):
+                        chunkin = True
+                        babyChunk += line
 
     def finish(self, line):
         return re.search(self.terminateRegexExp, line)
@@ -54,8 +61,41 @@ class Chunker:
     def getChunks(self):
         return self.chunks
 
-#"SEASTATE NO    [0-9]"
-#Test code:
-row = Row(1,2,3,4)
-table = Table("TestTable")
-table.addRow(row)
+class TextDataExtractor:
+    def __init__(self, splitToken, dataRegex):
+        self.splitToken = splitToken
+        self.dataRegex = dataRegex
+
+    def processLine(self, line):
+        result = []
+        if(self.match(line)):
+                result = line.split(self.splitToken)
+        result = list(filter(None, result))
+        return result
+        
+    def match(self, line):
+        return re.search(self.dataRegex, line)
+
+########################
+#      FUNCTIONS       #
+########################
+
+#^\s*\S+(?:\s+\S+){7,7}\s*$
+
+########################
+#      PROGRAM         #
+########################
+
+#Initial chunking:
+chunker = Chunker("SEASTATE NO[ ]{2,}[0-9]", "MAXIMUM BASE SHEAR", "WAJAC.LIS")
+chunks = chunker.getChunks()
+
+#Getting our required data in Lists:
+strProcessor = TextDataExtractor(" ", "^\s*\S+(?:\s+\S+){7,7}\s*$")
+
+result = Results("WAJAC.LIS Seastate Data")
+
+for chunk in chunks:
+    strProcessor.processLine(chunk, "hello everyone")
+
+
