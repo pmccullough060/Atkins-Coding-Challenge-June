@@ -20,9 +20,9 @@ class Tests(unittest.TestCase):
         self.assertEqual(18, len(result))
 
     def test_processLine(self):
-        dataExtractor = TextDataExtractor(" ", "^\s*\S+(?:\s+\S+){7,7}\s*$")
-        dataExtractor.processLine("         23    110.0     -1.2629E+04     1.0099E+04    -1.4177E+04    -4.4921E+08    -1.0126E+09    -3.2000E+08")
-        print("hey")
+        dataExtractor = TextDataExtractor(" ", "^\s*[0-9]+(?:\s+\S+){7,7}\s*$")
+        result = dataExtractor.processLine("         23    110.0     -1.2629E+04     1.0099E+04    -1.4177E+04    -4.4921E+08    -1.0126E+09    -3.2000E+08")
+        self.assertEqual(8, len(result))
 
    
 if __name__ == '__main__':
