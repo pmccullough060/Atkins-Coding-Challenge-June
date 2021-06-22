@@ -1,6 +1,6 @@
 # Atkins Coding Challenge June
 
-##About
+## About
 This is my attempt of the June coding challenge in Python, described as:
 
 "I have based this month’s challenge around reading an output file. The file I have provided, WAJAC.LIS, is produced by WAJAC which is a program used by some of our offshore structures teams to calculate wave loading."
