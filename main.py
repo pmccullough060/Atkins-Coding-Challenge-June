@@ -1,4 +1,5 @@
 import re
+import time
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -55,9 +56,9 @@ class Results:
         self.tables.append(table)
 
 class Chunker:
-    def __init__(self, startRegexExp, terminateRegexExp, fileName):
-        self.startRegexExp = startRegexExp
-        self.terminateRegexExp = terminateRegexExp
+    def __init__(self, startRegex, finishRegex, fileName):
+        self.startRegex = startRegex
+        self.finishRegex = finishRegex
         self.fileName = fileName
         self.chunks = []
 
@@ -80,10 +81,10 @@ class Chunker:
                         babyChunk += line
 
     def finish(self, line):
-        return re.search(self.terminateRegexExp, line)
+        return re.search(self.finishRegex, line)
 
     def start(self, line):
-        return re.search(self.startRegexExp, line) 
+        return re.search(self.startRegex, line) 
 
     def getChunks(self):
         return self.chunks
@@ -106,35 +107,38 @@ class TextDataExtractor:
 #      FUNCTIONS       #
 ########################
 
-#If functions required in future add here:
+def getTableName(line):
+    print("todo")
 
 ########################
 #      PROGRAM         #
 ########################
+
+#start timer
+t0 = time.time()
 
 #Initial chunking:
 chunker = Chunker("SEASTATE NO[ ]{2,}[0-9]", "MAXIMUM BASE SHEAR", "WAJAC.LIS")
 chunker.processFile()
 chunks = chunker.getChunks()
 
-#Getting our required data in Lists from a line of input data *if* it matches the regex:
-strProcessor = TextDataExtractor(" ", "^\s*[0-9]+(?:\s+\S+){7,7}\s*$")
+#Getting our required table data in Lists from a line of input data
+#*if* it matches the regex:
+dataExtTableData = TextDataExtractor(" ", "^\s*[0-9]+(?:\s+\S+){7,7}\s*$")
 
-result = Results("WAJAC.LIS Seastate Data")
+result = Results("Seastate Data")
 
-#populating the results object:
-for chunk in chunks:
-    table = Table(chunk[1])
+for count in range(0, len(chunks)):
+
+    #Setting the table name:
+    table = Table("Table " + str(count+1))
     result.addTable(table)
 
-    for line in chunk.splitlines():
-        lineResult = strProcessor.processLine(line)
+    for line in chunks[count].splitlines():
+        lineResult = dataExtTableData.processLine(line)
         if lineResult:
             lineResult = [float(item) for item in lineResult]
             table.addRow(lineResult)
-
-#Fetch seastate No.1 Table
-selectedTable = result.getTable(1)
 
 #Creating the pandas dataframes:
 dfs = []
@@ -145,16 +149,20 @@ for table in result.getTables():
                                 columns=['PHASE', 'Fx', 'Fy', 'Fz'])
     dfs.append(df)
 
-#Plot the first table dataframe
-dfs[0].plot()
-plt.show()
-
 #outputting dataframes to excel:
 with pd.ExcelWriter("output.xlsx") as writer:
-    index = 1
-    for df in dfs:
-        df.to_excel(writer, sheet_name='Sheet_' + str(index))
-        index += 1
+    for count in range(0, len(dfs)):
+        dfs[count].to_excel(writer, sheet_name='SEASTATE NO ' + str(count+1))
 
-print("Completed")
+#Time taken
+t1 = time.time()
+total = t1 - t0
 
+#Script Info
+print("##### Job Completed #####")
+print(len(dfs), "Tables processed")
+print("Time Taken: {:f} seconds".format(total))
+
+#Plot the first table dataframe
+dfs[12].plot()
+plt.show()
