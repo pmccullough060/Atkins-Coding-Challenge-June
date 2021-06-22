@@ -10,7 +10,7 @@ This is my attempt of the June coding challenge in Python, described as:
 - Create a graph for seastate number 1 that shows forces in X,Y,Z against phase angle.
 - Write the detailed tables for each seastate into a sheet in an excel workbook
 
-#### Dependencies
+## Dependencies
 - [matplotlib](https://matplotlib.org/)
 - [openpyxl](https://openpyxl.readthedocs.io/en/stable/#)
 - [pandas](https://pandas.pydata.org/)
