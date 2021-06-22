@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 ########################
 
 #Atkins coding challenge June 2021
-#This script parses the attached text file, plots the selected table and outputs *ALL* of the seastate table data to an excel file.
+#This script parses the attached text file, plots the selected sea state table and outputs *ALL* of the seastate table data to an excel file.
 
 ########################
 #         SETUP        #
@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 # py --version | pip --version  (check its all working)
 # pip install pandas
 # pip install matplotlib
+# pip install openpyxl
 # pip list (check everything is installed in the venv)
 
 ########################
@@ -47,11 +48,11 @@ class Results:
     def getTables(self):
         return self.tables
 
-    def addTable(self, table):
-        self.tables.append(table)
-
     def getTable(self, index):
         return self.tables[index]
+
+    def addTable(self, table):
+        self.tables.append(table)
 
 class Chunker:
     def __init__(self, startRegexExp, terminateRegexExp, fileName):
@@ -136,16 +137,24 @@ for chunk in chunks:
 selectedTable = result.getTable(1)
 
 #Creating the pandas dataframes:
-df = pd.DataFrame.from_dict(selectedTable.getDict(), 
-                            orient='index', 
-                            columns=['PHASE', 'Fx', 'Fy', 'Fz'])
+dfs = []
+for table in result.getTables():
+    data = table.getDict()
+    df = pd.DataFrame.from_dict(data, 
+                                orient='index', 
+                                columns=['PHASE', 'Fx', 'Fy', 'Fz'])
+    dfs.append(df)
 
-#Plot from the dataframe
-df.plot()
+#Plot the first table dataframe
+dfs[0].plot()
 plt.show()
 
-#outputting to excel:
+#outputting dataframes to excel:
+with pd.ExcelWriter("output.xlsx") as writer:
+    index = 1
+    for df in dfs:
+        df.to_excel(writer, sheet_name='Sheet_' + str(index))
+        index += 1
 
-
-print("complete")
+print("Completed")
 
