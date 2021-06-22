@@ -14,3 +14,23 @@ This is my attempt of the June coding challenge in Python, described as:
 - [matplotlib](https://matplotlib.org/)
 - [openpyxl](https://openpyxl.readthedocs.io/en/stable/#)
 - [pandas](https://pandas.pydata.org/)
+
+## Getting Started
+
+Create the virtual environment:
+
+```console
+    py -m venv venv
+```
+
+Activate it:
+
+```console
+    .\venv\Scripts\activate
+```
+
+Install dependencies:
+
+```console
+    pip install -r requirements.txt
+```
