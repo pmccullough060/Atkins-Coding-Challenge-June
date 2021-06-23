@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 #         ABOUT        #
 ########################
 
-#Atkins coding challenge June 2021
-#This script parses the attached text file, plots the selected sea state table and outputs *ALL* of the seastate table data to an excel file.
-#Instead of loading the file into memory it reads in line by line
-#The Chunker class uses regex expressions to extract the "chunks" of the file that are of interest
-#The chunks are iterated over using the DataExtractor which finds and formats the useful data
-#The DataExtractor is useful as sometimes there are line breaks etc within the useful data that should be ignored
+# Atkins coding challenge June 2021
+# This script parses the attached text file, plots the selected sea state table and outputs *ALL* of the seastate table data to an excel file.
+# Instead of loading the file into memory it reads in line by line
+# The Chunker class uses regex expressions to extract the "chunks" of the file that are of interest
+# The chunks are iterated over using the DataExtractor which finds and formats the useful data
+# The DataExtractor is useful as sometimes there are line breaks etc within the useful data that should be ignored
 
 ########################
 #         SETUP        #
@@ -147,14 +147,14 @@ dfs = []
 for table in result.getTables():
     data = table.getDict()
     df = pd.DataFrame.from_dict(data, 
-                                orient='index', 
-                                columns=['PHASE', 'Fx', 'Fy', 'Fz'])
+                                orient="index", 
+                                columns=["PHASE", "Fx", "Fy", "Fz"])
     dfs.append(df)
 
 #outputting dataframes to excel:
 with pd.ExcelWriter("output.xlsx") as writer:
     for count in range(0, len(dfs)):
-        dfs[count].to_excel(writer, sheet_name='SEASTATE NO ' + str(count+1))
+        dfs[count].to_excel(writer, sheet_name="SEASTATE NO " + str(count+1))
 
 #Time taken
 t1 = time.time()
@@ -166,5 +166,9 @@ print(len(dfs), "Tables processed")
 print("Time Taken: {:f} seconds".format(total))
 
 #Plot the first table dataframe
-dfs[0].plot()
+plot = dfs[0].plot(x="PHASE", title="Fx, Fy, Fz Against Phase Angle")
+plot.set_xlim(0,360)
+plot.set_xlabel("Phase Angle (Deg)")
+plot.set_ylabel("Force (N)")
+
 plt.show()
